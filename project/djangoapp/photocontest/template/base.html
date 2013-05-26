@@ -1,0 +1,19 @@
+<html>
+<head>
+<title> Photo Contest | {% block title%} {% endblock %}</title>
+<link rel="stylesheet" href="/media/style.css" type="text/css" />
+</head>
+
+<body>
+	<div id="nav">
+	<a href="/">home</a> |
+	{% if user.is_authenticated %}
+	 Hello! {{ user.username }}. (<a href="/logout/">logout</a>)
+     {% else %}
+     <a href="/login">login</a> | <a href="/register/"> join </a>
+     {% endif %}
+	</div>
+	<h1> {% block head %} {% endblock %}</h1>
+	{% block body %} {% endblock %}
+</body>
+</html>

@@ -1,3 +1,5 @@
 eclipse.preferences.version=1
-encoding//lab/performance.py=utf-8
 encoding//project/daumcrawler/daumimgcrawl.py=utf-8
+encoding//project/djangoapp/hotissue/crawlmgr/daumcrawler.py=utf-8
+encoding//project/djangoapp/photocontest/communicator/views.py=utf-8
+encoding//study/file/performance.py=utf-8

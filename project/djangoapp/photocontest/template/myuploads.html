@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} {{ user.username}}'s Uploads {% endblock %}
+{% block head %} {{ user.username }}'s Uploads {% endblock %}
+{% block body %}
+
+<hr noshade>
+{% if images %}
+	{% for im in images %} 
+		<li> <img src = {{ im.image.url }} alt = {{ im.title }} /></li>
+	{% endfor %}
+
+{% else %}
+	<li> There are no uploaded images.</li>
+{% endif %}
+
+{% endblock %}

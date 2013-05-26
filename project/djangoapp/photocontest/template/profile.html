@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %} {{ user.username}}'s Profile {% endblock %}
+{% block head %} {{ user.username }}'s Profile {% endblock %}
+{% block body %}
+
+<hr noshade>
+<h2> {{ user.username }} </h2>
+<img src={{ profile.profile_image.url }} />
+<ul type="disc">
+    <li> Email: {{ user.email }}
+    <li> Sex: {{ profile.sex }}
+    <li> Type: {{ profile.type }}
+    <li> Fair Point: {{ profile.fair_point }}
+    <li> Age: {{ profile.age }}
+    <li> Location: {{ profile.location }}
+    <li> Your image point: {{ profile.average_uptained_point }}</li>
+    <li> uploaded images: TO DO</li>
+    <li> Max hit count: {{ profile.max_succesive_hits }}
+    <li> Current hit count: {{ profile.current_succesive_hits }}
+</ul>
+
+{% endblock %}

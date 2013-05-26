@@ -3,11 +3,8 @@
 '''
 Created on 2009. 8. 9.
 
-@author: namjelee
-
 Benchmark to read and print from file.
-Using readlines, read, xreadlines, 반복자
-'''
+Using readlines, read, xreadlines, 반복??'''
 
 import os
 import time

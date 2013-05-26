@@ -1,14 +1,13 @@
 '''
 Created on 2009. 8. 24.
 
-@author: namjelee
 '''
 
 # Ex 6: Design Counter Class
 
 class Counter:
     step = 1
-    def __init__(self, value = 0):
+    def __init__(self, value=0):
         self.value = value
     
     def incr(self):
@@ -117,7 +116,7 @@ class Set:
     
 
 class BNode(object):
-    def __init__(self, value=None, left=None, right=None, depth = 1):
+    def __init__(self, value=None, left=None, right=None, depth=1):
         self._left = None
         self._right = None
         self._depth = 0
@@ -128,7 +127,7 @@ class BNode(object):
         self.setdepth(depth)
         
     def __repr__(self):
-        return "%s (\n%s%s\n%s%s)" % (self.value, "  "*self.depth, self.left, 
+        return "%s (\n%s%s\n%s%s)" % (self.value, "  "*self.depth, self.left,
                                       "  "*self.depth, self.right)
 #    
 #    def __setitem__(self, key, value):

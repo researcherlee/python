@@ -3,8 +3,6 @@
 
 
 '''
-한글: utf8로 한글 테스트
-
 This module is for getting images from the daum blog site.
 Given daum blog site, it searches all images that are uploaded by the users and
 downloads them all.
@@ -18,7 +16,10 @@ import sys
 import os
 import re
 import getopt
+from crawler import Crawler, PageInfo
 
+
+	
 ################################## GLOBAL ####################################
 
 """Predefined RE: To ignore preview images"""
@@ -27,6 +28,7 @@ daumSmallPattern = re.compile("/[^/]*?\d*?x\d.*?/")
 """Predefined RE: To get next article urls"""
 # Daum blog pattern: In <div class="sideListClr arrowDL"> ... href="XXXXX", 'XXXXX' is the next article URL
 daumNextArticlePattern = re.compile('''arrowDL.*?articleno=(\d+?)&''')
+daumPreviousArticlePattern = re.compile('''arrowUL.*?articleno=(\d+?)&''')
 
 """Predefined RE: To get article urls in list page of a blog"""
 # Daum blog pattern: In <class="main"> ... <a href="..." articleno="XXXXX">, 'XXXXX' is the article URL
@@ -149,11 +151,10 @@ def __elementsbyString(url, tag, target, index):
 	return __elementsbyPattern(url, p, index)
 
 
-kk = 0
+
 def __elementsbyPattern(url, pattern, index):
-	global kk
+
 	contents = urllib.urlopen(url).read()
-	kk = kk+1;
 
 	if index > 0:
 		elements = pattern.search(contents).group(index)
@@ -298,7 +299,6 @@ def main(argv):
 	totalnumofArticle = int(getFirstElementbyPattern(titleListUrl, p))
 	recentArticleUrl = getFirstElementbyPattern(titleListUrl, daumArticlePattern)
 	profileImgPath = getFirstElementbyPattern(titleListUrl, daumProfileImgPattern)
-	print "total: %d, recent: %s " % ( totalnumofArticle, recentArticleUrl)
 
 
 	#5. Set the number of articles to search images
@@ -367,9 +367,113 @@ def main(argv):
 			return
 	
 
+class DaumCrawler(Crawler):
+    url  = ""
+    model = None 
+    count = 0   
+    
+    def __init__(self, url):
+    	self.url = url
+    	mainUrl = url
+    	
+        #2. Get the blogId
+        self.blogId = mainUrl.rsplit("/", 1)[1]
+        
+        #3. Get the real blog url, then get the title list url 
+        ## Daum blog pattern: As soon as connection, daum main blog page is forwarded to its real contents page 
+        ## whose location can be extracted from  <frame ... src="....."> positioned first in the main blog page
+        forwardPageList = getElementsbyString(mainUrl, "frame", "src")
+        blogPostfix = forwardPageList[0].lstrip("/")
+        self.encodedId = re.search("blogid=(.*?)&", blogPostfix).group(1)
+        self.titleListUrl = daumBlogUrl + "/" + blogPostfix + daumBlogTitleListPostfix
+        
+        #4. Get the numbers of total articles and the first article number
+        ## Daum blog pattern: <span id="totC"> tag has the total number of articles in the blog
+        ## Daum blog pattern: refer daumArticlePattern description for recentArticleUrl
+        p = re.compile('span id="totC">(\d+?)</span>')
+        totalnumofArticle = int(getFirstElementbyPattern(self.titleListUrl, p))        
+        recentArticleUrl = getFirstElementbyPattern(self.titleListUrl, daumArticlePattern)
+        self.profileImgPath = getFirstElementbyPattern(self.titleListUrl, daumProfileImgPattern)
+
+    	self.length = totalnumofArticle
+    	self.recentArticleNum = self.currentArticleNum = recentArticleUrl
+  
+    
+    # Navigation functions
+    def go_next(self, step = 1):
+    	for i in range(step):
+    	   self.gogo(daumNextArticlePattern)
+
+    def go_previous(self, step = 1):
+		for i in range(step):   
+		   self.gogo(daumPreviousArticlePattern)
+    
+    def gogo(self, daumNaviPattern):    	
+    	articlePostfix = "/_blog/BlogView.do?blogid=" + self.encodedId + "&articleno=" + self.currentArticleNum + "&categoryId="
+    	articleContents = "/_blog/hdn/ArticleContentsView.do?blogid=08WMF&looping=0&longOpen="+ "&articleno=" + self.currentArticleNum
+    	try:
+		   self.currentArticleNum = getFirstElementbyPattern(daumBlogUrl + articlePostfix, daumNaviPattern)
+        except:
+		   raise IndexError
+	
+	
+    def go_article_num(self, articleNum):
+    	articlePostfix = "/_blog/BlogView.do?blogid=" + self.encodedId + "&articleno=" + articleNum + "&categoryId="
+    	   
+    
+    def go_absolute_url(self, url):
+        self.currentArticleNum = getFirstElementbyPattern()
+    
+    def go_recent(self):
+    	self.currentArticleNum = self.recentArticleNum
+    
+    def go_oldest(self):
+        raise NotImplementedError
+    
+    # Get Property for the blog
+    def get_length(self):
+    	return len(self)
+      
+    def __len__(self):
+    	return self.length
+    
+    def get_tag(self):
+        raise NotImplementedError
+    
+    def get_catalog_list(self):
+        """return the list of tuples ( URL, "Tag" )"""
+        raise NotImplementedError
+    
+    def get_catalog_crawler(self, name):
+        raise NotImplementedError
+    
+    def get_page_info(self):
+        """Parse current and return the parsed page info."""
+        articleContents = "/_blog/hdn/ArticleContentsView.do?blogid=08WMF&looping=0&longOpen="+ "&articleno=" + self.currentArticleNum
+        imgUrlsList = getElementsbyString(daumBlogUrl + articleContents, "img", "src")
+        filteredImgUrls = filterDaumUploadedImage(imgUrlsList)
+		#print "filteredImgUrls %s" % filteredImgUrls
+		
+		# small image and bloger profile image(babie_ice blog) will be filtered
+        filteredImgUrls = filter(
+								 lambda x: 
+    				    daumSmallPattern.search(x) == None and x != self.profileImgPath, filteredImgUrls)
+		#print "filteredImgUrls2 %s" % filteredImgUrls
+
+		# Replace &amp; to &
+        filteredImgUrls = [ s.replace("&amp;","&") for s in filteredImgUrls ]
+        
+        p = PageInfo()
+        p.url = daumBlogUrl + self.currentArticleNum
+        p.articleNum = self.currentArticleNum
+        p.imageUrls = filteredImgUrls
+        p.tag = ""
+        
+        return p		
+ 
+
 # Call the main function
 if __name__ == "__main__" :
-	main(sys.argv)
-	print "\nFinished the program. Check your current directory for images"
-
+    main(sys.argv)
+    print "\nFinished the program. Check your current directory for images"
 

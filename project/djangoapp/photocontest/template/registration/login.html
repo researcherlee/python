@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %} Photo Contest | User Login {% endblock %}
+{% block head %} User Login {% endblock %}
+{% block body %}
+{% if user.is_authenticated %}
+<p> {{ user.username }} 님은 로그인 상태입니다. (<a href="/logout/">로그아웃</a>)</p>
+<p> <a href="/">home</a>으로 가세요 </p>
+{% else %}
+  {% if form.errors %}
+<p> 사용자 이름과 비밀번호가 일치하지 않습니다. 다시 시도해 보십시요. </p>
+  {% endif %}
+<form method="post" action=".">
+<p><label for="id_username">사용자 이름: </label>
+{{ form.username }} </p>
+<p><label for="id_password">비밀번호: </label>
+{{ form.password }} </p>
+<input type="hidden" name="next" value="/" />
+<input type="submit" value="로그인" />
+</form>
+{% endif %}
+
+{% endblock %}

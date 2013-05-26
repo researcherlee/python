@@ -1,7 +1,6 @@
 '''
 Created on 2009. 8. 16.
 
-@author: namjelee
 '''
 
 
@@ -41,7 +40,7 @@ def accepts(*types):
                 assert isinstance(a, t), " arg %r does not match %s" % (a, t)
             return f(*args, **kwargs)
         
-        #new_f.func_name = f.func_name
+        # new_f.func_name = f.func_name
         return new_f    
     return check_accepts
 
