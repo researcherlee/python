@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %} 가입페이지 {% endblock %}
+{% block head %} 가입하세요. {% endblock %}
+{% block body %}
+
+{% if message %}
+  <h2> {{ message }} </h2>
+{% endif %}
+<form method="post" action=".">
+ {{ form.as_p }}
+ <input type="submit" value="가입" />
+</form>
+{% endblock %}

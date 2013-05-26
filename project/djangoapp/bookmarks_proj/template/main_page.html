@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %} 장고 북마크에 오신걸 환영합니다.{% endblock %}
+{% block head %} 장고 북마크에 오신것을 환영합니다.{% endblock %}
+{% block body %}
+	{% if user.is_authenticated %}
+	<p> {{ user.username }} 님 안녕하세요. 여기에 북마크를 저장하고 공유할 수 있습니다! </p>
+	{% else %}
+	<p> <a href="/login">로그인</a>하신 후에 북마크를 저장하고 공유할 수 있습니다!</p>
+	{% endif %}
+{% endblock %}

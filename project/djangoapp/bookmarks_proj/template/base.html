@@ -1,0 +1,20 @@
+<html>
+<head>
+<title> 장고 북마크�| {% block title%} {% endblock %}</title>
+<link rel="stylesheet" href="/site_media/style.css" type="text/css" />
+<script type="text/javascript" src="/site_media/jquery.js"></script>
+</head>
+
+<body>
+	<div id="nav">
+	<a href="/">home</a> |
+	{% if user.is_authenticated %}
+	 {{ user.username }}님 반갑습니다. (<a href="/logout/">로그아웃</a>)
+     {% else %}
+     <a href="/login">로그인</a> | <a href="/register/"> 가입 </a>
+     {% endif %}
+	</div>
+	<h1> {% block head %} {% endblock %}</h1>
+	{% block body %} {% endblock %}
+</body>
+</html>

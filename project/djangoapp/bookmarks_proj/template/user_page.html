@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %} {{ head_title }} {% endblock %}
+{% block head %} {{ username }} 의 북마크 입니다. {% endblock %}
+{% block body %}
+	{% if bookmarks %}
+		{% for bookmark in bookmarks %}
+		<li> <a href= {{ bookmark.link.url }} > {{ bookmark.title }} </a> </li>
+		{% endfor %}
+	
+	{% else %}
+		<li> 저장된 북마크가 없습니다. </li>
+	
+	{% endif %}
+{% endblock %}
